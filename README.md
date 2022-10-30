@@ -1,6 +1,6 @@
-# BluBot
+# UTMbot
 
-A self-hosted Discord bot with various moderation features and fun commands. Features a simple CLI and setup script for easy management.
+Fork of [BluBot](https://github.com/BluDood/BluBot) with some extra features specified for the UTM Discord Server.
 
 ## Features
 
