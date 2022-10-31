@@ -1,4 +1,4 @@
-const { Client, Collection, GatewayIntentBits } = require('discord.js')
+const { Client, Collection, GatewayIntentBits, Events } = require('discord.js')
 const fs = require('fs')
 const deploy = require('./utils/deploy')
 const bconsole = require('./console')
@@ -11,7 +11,7 @@ if (!fs.existsSync('./config.json')) {
 if (!fs.existsSync('./databases')) fs.mkdirSync('./databases')
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 })
 
 client.commands = new Collection()
@@ -30,8 +30,8 @@ for (const file of modalFiles) {
   client.modals.set(modal.id, modal)
 }
 
-bconsole.init()
-client.once('ready', async c => {
+bconsole.init(process.argv[2])
+client.once(Events.ClientReady, async c => {
   bconsole.motd(c.user.tag)
   deploy(c.user.id)
 })
@@ -41,15 +41,11 @@ for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith(
   client.on(event.event, event.listener)
 }
 
-client.on('unhandledRejection', error => {
+client.on(Events.Error, error => {
   console.log(error)
 })
 
-client.on('error', error => {
-  console.log(error)
-})
-
-client.on('interactionCreate', async interaction => {
+client.on(Events.InteractionCreate, async interaction => {
   if (interaction.isCommand()) {
     const command = client.commands.get(interaction.commandName)
     if (command) {

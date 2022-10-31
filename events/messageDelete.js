@@ -1,9 +1,10 @@
+const { AuditLogEvent, Events } = require('discord.js')
 const fs = require('fs')
 const log = require('../utils/log')
 const sleep = require('../utils/sleep')
 
 module.exports = {
-  event: 'messageDelete',
+  event: Events.MessageDelete,
   async listener(message) {
     if (!fs.existsSync('./databases/deleted.txt')) fs.writeFileSync('./databases/deleted.txt', 'false', 'utf-8')
     if (fs.readFileSync('./databases/deleted.txt', 'utf-8') === 'true') {
@@ -13,7 +14,7 @@ module.exports = {
     await sleep(1000)
     const fetchedLogs = await message.guild.fetchAuditLogs({
       limit: 1,
-      type: 'MESSAGE_DELETE'
+      type: AuditLogEvent.MessageDelete
     })
     const deletionLog = fetchedLogs.entries.first()
     const { executor, target } = deletionLog || {}
