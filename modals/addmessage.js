@@ -29,6 +29,7 @@ module.exports = {
       method: 'POST',
       headers: {
         Accept: 'application/vnd.github+json',
+        // this token got reset so don't waste your time ;)
         Authorization: 'token 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'
       },
       data: {
@@ -36,7 +37,12 @@ module.exports = {
           extraInfo.length !== 0 ? `<br><h2>Extra Information:</h2>${extraInfo}` : ''
         }<br><details><summary><h2>Issuer and moderator</h2></summary>Issuer: ${issueMessage.author.tag}<br>Moderator: ${interaction.user.tag}</details>`
       }
-    })
+    }).catch(() => null)
+    if (!res || !res.data)
+      return interaction.reply({
+        content: 'I could not access the GitHub API!',
+        ephemeral: true
+      })
     const embed = {
       color: resolveColor(accent),
       title: 'Added this message as a comment!',
