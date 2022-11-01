@@ -4,3 +4,6 @@ old/
 databases/*
 config utm.json
 config.json
+
+.vscode/
+out/
