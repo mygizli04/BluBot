@@ -6,7 +6,7 @@ import checkUserPerms from '../utils/checkUserPerms.mjs';
 import { CommandInteraction, Interaction, MessageContextMenuCommandInteraction } from "discord.js";
 
 function checkCommandType(interaction: CommandInteraction): interaction is MessageContextMenuCommandInteraction {
-  return interaction.commandType !== ApplicationCommandType.Message;
+  return interaction.commandType === ApplicationCommandType.Message;
 }
 
 const command: Command = {

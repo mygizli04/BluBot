@@ -39,7 +39,7 @@ client.once(Events.ClientReady, async c => {
   deploy(c.user.id)
 })
 
-for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js'))) {
+for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js') || file.endsWith(".mjs"))) {
   const event = require(`./events/${eventFile}`)
   client.on(event.event, event.listener)
 }
