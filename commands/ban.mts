@@ -7,7 +7,7 @@ const accent = customization?.accent;
 
 import checkUserPerms from '../utils/checkUserPerms.mjs';
 import directMessage from '../utils/directMessage.mjs';
-import log from '../utils/log.js';
+import log from '../utils/log.mjs';
 
 function checkCommandType(interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
   return interaction.commandType === ApplicationCommandType.ChatInput;
@@ -71,14 +71,9 @@ const command: Command = {
         ephemeral: true
       })
     await member.ban({ deleteMessageSeconds: days * 60 * 60 * 24, reason: reason })
-    log(interaction.guild, 'ban', {
-      target: {
-        id: target.id,
-        tag: target.tag
-      },
-      moderator: {
-        id: interaction.user.id
-      },
+    log(interaction.guild!, 'ban', {
+      target,
+      moderator: interaction.user,
       reason
     })
   }

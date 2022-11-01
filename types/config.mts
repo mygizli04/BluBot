@@ -60,10 +60,13 @@ export function validateChannelsConfig (config: ChannelsConfig): config is Chann
     return true;
 }
 
-export async function getConfig(): Promise<FullConfig> {
-    const config = JSON.parse(await fs.readFile("./config.json", "utf-8"));
+let config: FullConfig;
 
-    if (!validateConfig(config)) throw new Error("Invalid config");
+export async function getConfig(): Promise<FullConfig> {
+    if (!config) {
+        config = JSON.parse(await fs.readFile("./config.json", "utf-8"));
+        if (!validateConfig(config)) throw new Error("Invalid config");
+    }
 
     return config as FullConfig;
 }

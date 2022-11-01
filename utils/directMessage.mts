@@ -31,9 +31,9 @@ function getTemplate(info: {reason: string, moderator?: {id: string}}): Template
   }
 }
 
-type EmbedTypes = "ban" | "kick" | "timeout" | "untimeout"
+export type PunishmentEmbedTypes = "ban" | "kick" | "timeout" | "untimeout"
 
-function getType<T extends EmbedTypes>(guild: Guild, type: T, info: T extends "timeout" ? Required<MessageInfo> : MessageInfo): Template {
+function getType<T extends PunishmentEmbedTypes>(guild: Guild, type: T, info: T extends "timeout" ? Required<PunishmentMessageInfo> : PunishmentMessageInfo): Template {
   const template = getTemplate(info as any);
 
   return {
@@ -68,17 +68,20 @@ function getType<T extends EmbedTypes>(guild: Guild, type: T, info: T extends "t
   }[type]();
 }
 
-interface MessageInfo {
+export interface PunishmentMessageInfo {
   reason: string,
   moderator: {
     id: string
   },
-  duration?: string
+  duration?: string,
+  target?: User,
+  channel?: {
+    id: string
+  }
 }
 
 // duration in info only required if type is timeout
-export default async function directMessage<T extends EmbedTypes>(guild: Guild, target: User, type: T, info: T extends "timeout" ? Required<MessageInfo> : MessageInfo): Promise<boolean> {
-  // TODO: Figure out type of info
+export default async function directMessage<T extends PunishmentEmbedTypes>(guild: Guild, target: User, type: T, info: T extends "timeout" ? Required<PunishmentMessageInfo> : PunishmentMessageInfo): Promise<boolean> {
   const embed = getType(guild, type, info)
 
   //const embed = types[type]

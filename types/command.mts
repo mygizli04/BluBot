@@ -1,4 +1,4 @@
-import { CommandInteraction, ContextMenuCommandBuilder, SlashCommandBuilder } from "discord.js";
+import type { CommandInteraction, ContextMenuCommandBuilder, SlashCommandBuilder } from "discord.js";
 
 export default interface Command {
     data: ContextMenuCommandBuilder | SlashCommandBuilder
