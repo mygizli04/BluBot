@@ -1,18 +1,30 @@
-const { SlashCommandBuilder } = require('discord.js')
-const { Instance } = require('chalk')
-const os = require('os')
-const { getDependency, getVersion, getPackageAmount } = require('../utils/packagejson')
+import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { Instance } from 'chalk';
+import os from 'os';
+import { getDependency, getVersion, getPackageAmount } from '../utils/packagejson';
+import Command from '../types/command.mjs';
 
 const chalk = new Instance({
   level: 1
 })
 
-module.exports = {
+function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
+  return interaction.commandType === ApplicationCommandType.ChatInput;
+}
+
+const command: Command = {
   data: new SlashCommandBuilder()
     .setName('neofetch')
     .setDescription('Information about this bot')
-    .addBooleanOption(option => option.setName('minimal').setDescription('Show minimal message without ASCII art. Better for mobile screens.')),
+    .addBooleanOption(option => option.setName('minimal').setDescription('Show minimal message without ASCII art. Better for mobile screens.')) as SlashCommandBuilder,
   async execute(interaction) {
+    if (!checkCommandType(interaction)) {
+      return interaction.reply({
+        content: 'This command is only available as a slash command.',
+        ephemeral: true
+      })
+    }
+    
     const minimal = interaction.options.getBoolean('minimal')
     let uptime = process.uptime()
     const hours = Math.floor(uptime / 3600)
@@ -31,7 +43,7 @@ module.exports = {
       '',
       `${chalk.red("Version")}: ${getVersion()}`,
       `${chalk.red("node")}: ${process.version}`,
-      `${chalk.red("discord.js")}: v${getDependency('discord.js').version}`,
+      `${chalk.red("discord.js")}: v${getDependency('discord.js')!.version}`,
       '',
       `${chalk.red("Uptime")}: ${hours ? `${hours} hours, ` : ''}${minutes ? `${minutes} minutes and ` : ''}${seconds} seconds`,
       `${chalk.red("Ping")}: ${interaction.client.ws.ping}ms`,
@@ -73,3 +85,5 @@ module.exports = {
       : interaction.reply(`\`\`\`ansi\n${chalk.blue(ascii.map((a, i) => '  ' + a + '  ' + (info[i - offset] || '')).join('\n'))}\n\n\n\`\`\``)
   }
 }
+
+export default command;
