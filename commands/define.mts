@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, resolveColor, SlashCommandBuilder } from 'discord.js';
+import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, ReactionUserManager, resolveColor, SlashCommandBuilder } from 'discord.js';
 import axios from "axios";
 
 import { getConfig } from '../types/config.mjs';
@@ -8,6 +8,17 @@ const accent = customization?.accent;
 
 function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
   return interaction.commandType === ApplicationCommandType.ChatInput;
+}
+
+interface QueryReply {
+  success: boolean,
+  amount: number,
+  result: Result[]
+}
+
+interface Result {
+  word: string,
+  description: string
 }
 
 const command: Command = {
@@ -28,9 +39,8 @@ const command: Command = {
     // my api ;)
     const api = 'https://urbanapi.up.railway.app'
     const query = interaction.options.getString('query')
-    // TODO: Get types for this
-    const res = await axios.get(`${api}/define/${query}`)
-    if (!res?.data?.success) return interaction.editReply('An error has occured!')
+    const res = await axios.get<QueryReply>(`${api}/define/${query}`)
+    if (!res.data.success) return interaction.editReply('An error has occured!')
     if (res.status === 404) return interaction.editReply('Could not find that word!')
     const embed = {
       color: accent ? resolveColor(accent as HexColorString) : undefined,
