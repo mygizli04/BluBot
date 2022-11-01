@@ -1,59 +1,6 @@
 import fs from 'fs';
 
-interface Config {
-  guildId: string | null,
-  token: string | null,
-  customization?: CustomizationConfig,
-  modRoles: number[],
-  channels: ChannelsConfig;
-}
-
-function validateConfig (config: Config): config is Config {
-  if (typeof config.guildId !== "string" && config.guildId !== null) return false;
-  if (typeof config.token !== "string" && config.token !== null) return false;
-  if (config.customization && !validateCustomizationConfig(config.customization)) return false;
-  if (!Array.isArray(config.modRoles)) return false;
-  if (config.modRoles.length > 0 && config.modRoles.some(r => typeof r !== "number")) return false;
-  if (typeof config.channels !== "object") return false;
-
-  return true;
-}
-
-interface CustomizationConfig {
-  accent?: string,
-  colors?: ColorCustomizationConfig;
-}
-
-function validateCustomizationConfig (config: CustomizationConfig): config is CustomizationConfig {
-  if (typeof config.accent !== "string" && config.accent !== undefined) return false;
-  if (config.colors && !validateColorCustomizationConfig(config.colors)) return false;
-
-  return true;
-}
-
-interface ColorCustomizationConfig {
-  good?: string,
-  medium?: string,
-  bad?: string;
-}
-
-function validateColorCustomizationConfig (config: ColorCustomizationConfig): config is ColorCustomizationConfig {
-  if (typeof config.good !== "string" && config.good !== undefined) return false;
-  if (typeof config.medium !== "string" && config.medium !== undefined) return false;
-  if (typeof config.bad !== "string" && config.bad !== undefined) return false;
-
-  return true;
-}
-
-interface ChannelsConfig {
-  logs: number | null;
-}
-
-function validateChannelsConfig (config: ChannelsConfig): config is ChannelsConfig {
-  if (typeof config.logs !== "number" && config.logs !== null) return false;
-
-  return true;
-}
+import { Config, validateConfig } from './types/config.mjs';
 
 const current: Config = {
   guildId: null,

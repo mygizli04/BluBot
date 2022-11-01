@@ -1,11 +1,13 @@
-const sleep = require('./sleep')
+import sleep from './sleep.mjs';
 
-module.exports = id => {
-  const fs = require('fs')
-  const crypto = require('crypto')
-  const { Routes, REST } = require('discord.js')
-  const { guildId, token } = require('../config.json')
+import fs from "fs";
+import crypto from "crypto";
+import { Routes, REST } from 'discord.js';
+import { getConfig } from '../types/config.mjs';
 
+const { guildId, token } = await getConfig();
+
+export default (id: string) => {
   const commands = []
   const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 

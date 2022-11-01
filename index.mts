@@ -1,7 +1,10 @@
-const { Client, Collection, GatewayIntentBits, Events } = require('discord.js')
-const fs = require('fs')
-const deploy = require('./utils/deploy')
-const bconsole = require('./console')
+import { Client, Collection, GatewayIntentBits, Events } from 'discord.js';
+import fs from 'fs';
+import deploy from './utils/deploy.mjs';
+import bconsole from './console.js';
+
+import Command from "./types/command.mjs"
+import Modal from './types/modal.mjs';
 
 if (!fs.existsSync('./config.json')) {
   console.log("Looks like you haven't set up the bot yet! Please run 'npm run setup' and try again.")
@@ -12,22 +15,22 @@ if (!fs.existsSync('./databases')) fs.mkdirSync('./databases')
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
-})
+});
 
-client.commands = new Collection()
-client.modals = new Collection()
+const commands = new Collection<string, Command>()
+const modals = new Collection<string, Modal>()
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const modalFiles = fs.readdirSync('./modals').filter(file => file.endsWith('.js'))
 
 for (const file of commandFiles) {
-  const command = require(`./commands/${file}`)
-  client.commands.set(command.data.name, command)
+  const command: Command = await import(`./commands/${file}`)
+  commands.set(command.data.name, command)
 }
 
 for (const file of modalFiles) {
   const modal = require(`./modals/${file}`)
-  client.modals.set(modal.id, modal)
+  modals.set(modal.id, modal)
 }
 
 bconsole.init(process.argv[2])
@@ -47,7 +50,7 @@ client.on(Events.Error, error => {
 
 client.on(Events.InteractionCreate, async interaction => {
   if (interaction.isCommand()) {
-    const command = client.commands.get(interaction.commandName)
+    const command = commands.get(interaction.commandName)
     if (command) {
       try {
         await command.execute(interaction)
@@ -56,7 +59,7 @@ client.on(Events.InteractionCreate, async interaction => {
       }
     }
   } else if (interaction.isModalSubmit()) {
-    const modal = client.modals.get(interaction.customId)
+    const modal = modals.get(interaction.customId)
     if (modal) {
       try {
         await modal.execute(interaction)
