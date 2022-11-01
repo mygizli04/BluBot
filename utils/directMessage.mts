@@ -1,19 +1,11 @@
-import { APIEmbed, Embed, Guild, User } from "discord.js";
+import { APIEmbed, APIUnavailableGuild, Guild, HexColorString, resolveColor, User } from "discord.js";
 import { getConfig } from "../types/config.mjs";
+import { DMInfo, DMType } from "../types/directMessage/index.mjs";
+import { validateBanDMInfo, validateKickDMInfo, validateTimeoutDMInfo } from "../types/directMessage/info/info.mjs";
+import { Template } from "../types/directMessage/template/index.mjs";
 
 const { customization } = await getConfig();
 const colors = customization?.colors;
-
-interface Template {
-  title: string,
-  fields: Field[],
-  color?: string
-}
-
-interface Field {
-  name: string,
-  value: string,
-}
 
 function getTemplate(info: {reason: string, moderator?: {id: string}}): Template {
   return {
@@ -33,56 +25,47 @@ function getTemplate(info: {reason: string, moderator?: {id: string}}): Template
 
 export type PunishmentEmbedTypes = "ban" | "kick" | "timeout" | "untimeout"
 
-function getType<T extends PunishmentEmbedTypes>(guild: Guild, type: T, info: T extends "timeout" ? Required<PunishmentMessageInfo> : PunishmentMessageInfo): Template {
+function getEmbed(guild: Guild, type: DMType, info: DMInfo): APIEmbed {
   const template = getTemplate(info as any);
 
-  return {
-    ban: () => {
-      const embed = {...template}
+  switch (type) {
+    case "ban": {
+      if (!validateBanDMInfo(info)) throw new Error("Invalid ban info");
+      const embed = {...template} as APIEmbed
       embed.title = `You have been banned in ${guild.name}!`
-      embed.color = colors?.bad ?? '#f45450'
+      embed.color = colors?.bad ? resolveColor(colors?.bad as HexColorString) : resolveColor('#f45450');
       return embed
-    },
-    kick: () => {
-      const embed = {...template}
+    }
+    case "kick": {
+      if (!validateKickDMInfo(info)) throw new Error("Invalid kick info");
+      const embed = {...template} as APIEmbed
       embed.title = `You have been kicked from ${guild.name}!`
-      embed.color = colors?.bad ?? '#f45450'
+      embed.color = colors?.bad ? resolveColor(colors?.bad as HexColorString) : resolveColor('#f45450');
       return embed
-    },
-    timeout: () => {
-      const embed = {...template}
+    }
+    case "timeout": {
+      if (!validateTimeoutDMInfo(info)) throw new Error("Invalid timeout info");
+      const embed = {...template} as APIEmbed
       embed.title = `You have been timed out in ${guild.name}!`
-      embed.color = colors?.medium ?? '#fdbc40'
-      embed.fields.splice(1, 0, {
+      embed.color = colors?.medium ? resolveColor(colors?.medium as HexColorString) : resolveColor('#fdbc40')
+      embed.fields!.splice(1, 0, {
         name: 'Duration',
         value: info.duration!
       })
       return embed
-    },
-    untimeout: () => {
-      const embed = {...template}
+    }
+    case "untimeout": {
+      const embed = {...template} as APIEmbed
       embed.title = `Your timeout has been removed in ${guild.name}!`
-      embed.color = colors?.good ?? '#36c84b'
+      embed.color = colors?.good ? resolveColor(colors?.good as HexColorString) : resolveColor('#43b581')
       return embed
     }
-  }[type]();
-}
-
-export interface PunishmentMessageInfo {
-  reason: string,
-  moderator: {
-    id: string
-  },
-  duration?: string,
-  target?: User,
-  channel?: {
-    id: string
   }
 }
 
 // duration in info only required if type is timeout
-export default async function directMessage<T extends PunishmentEmbedTypes>(guild: Guild, target: User, type: T, info: T extends "timeout" ? Required<PunishmentMessageInfo> : PunishmentMessageInfo): Promise<boolean> {
-  const embed = getType(guild, type, info)
+export default async function directMessage(guild: Guild, target: User, type: DMType, info: DMInfo): Promise<boolean> {
+  const embed = getEmbed(guild, type, info)
 
   //const embed = types[type]
   if (!type) return false;

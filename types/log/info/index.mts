@@ -29,7 +29,7 @@ export function validateKickPunishmentInfo(info: any): info is KickPunishmentInf
 }
 
 export interface TimeoutPunishmentInfo extends BanPunishmentInfo {
-    duration: number
+    duration: string
 }
 
 export function validateTimeoutPunishmentInfo(info: any): info is TimeoutPunishmentInfo {
