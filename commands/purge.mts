@@ -1,11 +1,17 @@
-const { SlashCommandBuilder } = require('discord.js')
-const {
-  customization: { accent }
-} = require('../config.json')
-const checkUserPerms = require('../utils/checkUserPerms')
-const log = require('../utils/log')
+import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder, TextChannel } from 'discord.js';
+import checkUserPerms from '../utils/checkUserPerms.mjs';
+import log from '../utils/log.mjs';
 
-module.exports = {
+import { getConfig } from '../types/config.mjs';
+import Command from '../types/command.mjs';
+const { customization } = await getConfig();
+const accent = customization?.accent;
+
+function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
+  return interaction.commandType === ApplicationCommandType.ChatInput;
+}
+
+const command: Command = {
   data: new SlashCommandBuilder()
     .setName('purge')
     .setDescription('Purge messages.')
@@ -23,15 +29,24 @@ module.exports = {
         .addUserOption(option => option.setName('user').setDescription('User to purge messages for').setRequired(true))
         .addNumberOption(option => option.setName('amount').setDescription('Amount of messages to purge (max 100)').setRequired(true))
         .addChannelOption(option => option.setName('channel').setDescription('Channel to purge messages in'))
-    ),
+    ) as SlashCommandBuilder,
   async execute(interaction) {
-    if (!checkUserPerms(interaction))
+    if (!checkUserPerms(interaction as Interaction)) {
       return interaction.reply({
         content: 'You do not have permission to do that!',
         ephemeral: true
       })
-    const amount = interaction.options.getNumber('amount')
-    const channel = interaction.options.getChannel('channel') || interaction.channel
+    }
+
+    if (!checkCommandType(interaction)) {
+      return interaction.reply({
+        content: 'This command is only available as a slash command.',
+        ephemeral: true
+      })
+    }
+
+    const amount = interaction.options.getNumber('amount')!;
+    const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel
     const user = interaction.options.getUser('user')
 
     if (amount > 100) return interaction.reply('You can only purge up to 100 messages at once.')
@@ -44,25 +59,21 @@ module.exports = {
         embeds: [
           {
             title: `Purged ${amount} message${amount === 1 ? '' : 's'} in #${channel.name}!`,
-            color: accent
+            color: accent ? resolveColor(accent as HexColorString): undefined
           }
         ],
         ephemeral: true
       })
-      log(interaction.guild, 'purge', {
-        moderator: {
-          id: interaction.user.id
-        },
-        channel: {
-          id: channel.id
-        },
+      log(interaction.guild!, 'purge', {
+        moderator: interaction.user,
+        channel: channel,
         amount
       })
       return
     } else if (command === 'user') {
-      const messages = channel.messages.fetch({ limit: 100 })
-      const userMessages = (await messages)
-        .filter(m => m.author.id === user.id)
+      const messages = await channel.messages.fetch({ limit: 100 })
+      const userMessages = messages
+        .filter(m => m.author.id === user!.id)
         .toJSON()
         .splice(0, amount)
       if (userMessages.length === 0) return interaction.reply('Could not find any messages by that user.')
@@ -70,26 +81,21 @@ module.exports = {
       await interaction.reply({
         embeds: [
           {
-            title: `Purged ${amount} message${amount == 1 ? '' : 's'} by ${user.tag} in #${channel.name}!`,
-            color: accent
+            title: `Purged ${amount} message${amount == 1 ? '' : 's'} by ${user!.tag} in #${channel.name}!`,
+            color: accent ? resolveColor(accent as HexColorString): undefined
           }
         ],
         ephemeral: true
       })
-      log(interaction.guild, 'purge', {
-        target: {
-          id: user.id,
-          tag: user.tag
-        },
-        moderator: {
-          id: interaction.user.id
-        },
-        channel: {
-          id: channel.id
-        },
+      log(interaction.guild!, 'purge', {
+        target: user!,
+        moderator: interaction.user,
+        channel,
         amount
       })
       return
     }
   }
 }
+
+export default command;
