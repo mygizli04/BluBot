@@ -1,7 +1,7 @@
 import { Client, Collection, GatewayIntentBits, Events } from 'discord.js';
 import fs from 'fs';
 import deploy from './utils/deploy.mjs';
-import bconsole from './console.js';
+import bconsole from './console.mjs';
 
 import Command from "./types/command.mjs"
 import Modal from './types/modal.mjs';

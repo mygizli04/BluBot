@@ -1,9 +1,9 @@
-const chalk = require('chalk')
-const sleep = require('./utils/sleep')
+import chalk from 'chalk';
+import sleep from './utils/sleep.mjs';
 
 let minimal = false
 
-async function motd(tag) {
+async function motd(tag: string) {
   !minimal && console.clear()
   const ascii = `______ _      ______       _   
 | ___ \\ |     | ___ \\     | |  
@@ -45,8 +45,8 @@ const commands = {
   }
 }
 
-module.exports = {
-  init: arg => {
+export default {
+  init: (arg: string) => {
     if (arg === '--minimal') minimal = true
     !minimal && console.clear()
     console.log(chalk.yellow('Starting BluBot...'))
@@ -56,16 +56,21 @@ module.exports = {
       process.stdin.setEncoding('utf8')
 
       process.stdin.on('data', key => {
-        if (key === '\u0003') process.exit()
-        const found = commands[key]
-        if (!found) return
-        found()
+        const keyStr = key.toString();
+        if (keyStr === '\u0003') process.exit()
+        // If the key isn't a key of commands, ignore it
+        if (!Object.keys(commands).includes(keyStr)) {
+          // @ts-ignore-error | It's ok, we just checked that keyStr is a valid key in the if statement
+          return commands[keyStr]()
+        }
       })
     } else {
       process.stdin.on('data', line => {
-        const found = commands[line.toString().trim()]
-        if (!found) return
-        found()
+        const lineStr = line.toString().trim()
+        if (!Object.keys(commands).includes(lineStr)) {
+          // @ts-ignore-error | It's ok, we just checked that keyStr is a valid key in the if statement
+          return commands[keyStr]()
+        }
       })
     }
   },
