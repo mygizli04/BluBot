@@ -6,7 +6,7 @@ const { customization } = await getConfig();
 const accent = customization?.accent;
 
 import checkUserPerms from '../utils/checkUserPerms.mjs';
-import directMessage from '../utils/directMessage.js';
+import directMessage from '../utils/directMessage.mjs';
 import log from '../utils/log.js';
 
 function checkCommandType(interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
@@ -59,7 +59,7 @@ const command: Command = {
       ],
       ephemeral: true
     })
-    const dm = await directMessage(interaction.guild, target, 'ban', {
+    const dm = await directMessage(interaction.guild!, target, 'ban', {
       reason,
       moderator: {
         id: interaction.user.id
