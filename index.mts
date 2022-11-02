@@ -42,7 +42,7 @@ client.once(Events.ClientReady, async c => {
   deploy(c.user.id)
 })
 
-for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js'))) {
+for (const eventFile of fs.readdirSync('./out/events').filter(file => file.endsWith('.mjs'))) {
   const event: Event = (await import(`./events/${eventFile}`)).default
   // Since there is only a few events I know they will work so ok to type them as any
   client.on(event.event, event.listener as any)
