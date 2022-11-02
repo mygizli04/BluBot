@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs'; // It's fine that this is sync since there's nothing else going on.
 
 import { Config, validateConfig } from './types/config.js';
 
