@@ -2,7 +2,8 @@ node_modules/
 package-lock.json
 old/
 databases/*
-config utm.json
+config.prod.json
+config.test.json
 config.json
 
 .vscode/
