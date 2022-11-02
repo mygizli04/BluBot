@@ -1,20 +1,19 @@
-const { Events } = require('discord.js')
-const fs = require('fs')
-const log = require('../utils/log')
+import { Events } from 'discord.js';
+import Event from '../types/event.mjs';
+import log from '../utils/log.mjs';
 
-module.exports = {
+const event: Event = {
   event: Events.MessageUpdate,
   async listener(oldMessage, newMessage) {
     if (oldMessage.content === newMessage.content) return
+    if (!newMessage.guild) return;
     log(newMessage.guild, 'messageEdit', {
       oldMessage: oldMessage.content,
       content: newMessage.content,
-      target: {
-        id: newMessage.author.id
-      },
-      channel: {
-        id: newMessage.channel.id
-      }
+      target: newMessage.author,
+      channel: newMessage.channel
     })
   }
 }
+
+export default event;
