@@ -5,6 +5,7 @@ import bconsole from './console.mjs';
 
 import Command from "./types/command.mjs"
 import Modal from './types/modal.mjs';
+import Event from './types/event.mjs';
 
 import { getConfig, configPath } from './types/config.mjs';
 
@@ -41,9 +42,10 @@ client.once(Events.ClientReady, async c => {
   deploy(c.user.id)
 })
 
-for (const eventFile of [] /*fs.readdirSync('./events').filter(file => file.endsWith('.js'))*/) {
-  const event = require(`./events/${eventFile}`)
-  client.on(event.event, event.listener)
+for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js'))) {
+  const event: Event = (await import(`./events/${eventFile}`)).default
+  // Since there is only a few events I know they will work so ok to type them as any
+  client.on(event.event, event.listener as any)
 }
 
 client.on(Events.Error, error => {
