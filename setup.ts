@@ -79,5 +79,5 @@ if (!validateConfig(current)) {
   process.exit(1);
 }
 fs.writeFileSync('config.json', JSON.stringify(current));
-console.log("Success! Install dependencies with the command 'npm install', and start the bot with 'npm start'!");
+console.log("Success! Install dependencies with the command 'npm install', compile the application with 'npm run transpile', and start the bot with 'npm start'!");
 process.exit();
