@@ -1,8 +1,11 @@
 import { ContextMenuCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder } from '@discordjs/builders';
 import { ApplicationCommandType, TextInputStyle } from 'discord-api-types/payloads/v10';
-import { ChatInputCommandInteraction, CommandInteraction, Interaction, MessageContextMenuCommandInteraction } from 'discord.js';
+import { CommandInteraction, Interaction, MessageContextMenuCommandInteraction } from 'discord.js';
 import Command from '../types/command.mjs';
 import checkUserPerms from '../utils/checkUserPerms.mjs';
+
+import { getConfig } from "../types/config.mjs";
+const { githubToken } = await getConfig();
 
 function checkCommandType(interaction: CommandInteraction): interaction is MessageContextMenuCommandInteraction {
   return interaction.commandType === ApplicationCommandType.Message;
@@ -12,6 +15,13 @@ function checkCommandType(interaction: CommandInteraction): interaction is Messa
 const command: Command = {
   data: new ContextMenuCommandBuilder().setName('Create GitHub Issue').setType(ApplicationCommandType.Message),
   async execute(interaction) {
+    if (!githubToken) {
+      return interaction.reply({
+        content: 'Github integration is currently disabled.',
+        ephemeral: true
+      })
+    }
+
     if (!checkUserPerms(interaction as Interaction)) {
       return interaction.reply({
         content: 'You do not have permission to do that!',

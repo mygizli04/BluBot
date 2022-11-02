@@ -10,16 +10,16 @@ const accent = customization?.accent;
 const modal: Modal = {
   id: 'addmessage',
   async execute(interaction) {
-    if (!checkUserPerms(interaction as Interaction)) {
-      return interaction.reply({
-        content: 'You do not have permission to do that!',
-        ephemeral: true
-      })
-    }
-
     if (!githubToken) {
       return interaction.reply({
         content: 'Github integration is currently disabled.',
+        ephemeral: true
+      })
+    }
+    
+    if (!checkUserPerms(interaction as Interaction)) {
+      return interaction.reply({
+        content: 'You do not have permission to do that!',
         ephemeral: true
       })
     }

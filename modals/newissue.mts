@@ -1,37 +1,49 @@
-const axios = require('axios').default
-const checkUserPerms = require('../utils/checkUserPerms')
-const { resolveColor } = require('discord.js')
-const {
-  customization: { accent }
-} = require('../config.json')
+import axios from "axios";
+import checkUserPerms from '../utils/checkUserPerms.mjs';
+import { APIEmbed, HexColorString, resolveColor } from 'discord.js';
 
-module.exports = {
+import { getConfig } from "../types/config.mjs";
+import Modal from "../types/modal.mjs";
+const { customization, githubToken } = await getConfig();
+const accent = customization?.accent;
+
+const modal: Modal = {
   id: 'newissue',
   async execute(interaction) {
-    if (!checkUserPerms(interaction))
+    if (!githubToken) {
+      return interaction.reply({
+        content: 'GitHub integration is currently disabled.',
+        ephemeral: true
+      })
+    }
+    
+    if (!checkUserPerms(interaction)) {
       return interaction.reply({
         content: 'You do not have permission to do that!',
         ephemeral: true
       })
-    const messageId = interaction.fields.fields.find(f => f.customId === 'messageId').value
-    const issueMessage = await interaction.channel.messages.fetch(messageId).catch(() => null)
+    }
+
+    const messageId = interaction.fields.fields.find(f => f.customId === 'messageId')!.value
+    const issueMessage = await interaction.channel!.messages.fetch(messageId).catch(() => null)
     if (!issueMessage)
       return interaction.reply({
         content: 'I could not find that message!',
         ephemeral: true
       })
 
-    const title = interaction.fields.fields.find(f => f.customId === 'title').value
-    const extraInfo = interaction.fields.fields.find(f => f.customId === 'extrainfo').value
+    const title = interaction.fields.fields.find(f => f.customId === 'title')!.value
+    const extraInfo = interaction.fields.fields.find(f => f.customId === 'extrainfo')!.value
     const attachments = issueMessage.attachments.map(a => `[${a.name}](${a.url})`)
     const imageTypes = ['png', 'jpg', 'jpeg', 'webp', 'gif']
-    const thumbnail = issueMessage.attachments.filter(f => imageTypes.includes(f.name.split('.')[0]))[0]
+    const thumbnail = issueMessage.attachments.filter(f => f.name && imageTypes.includes(f.name.split('.')[0])).first()
     const res = await axios(`https://api.github.com/repos/UTMDiscordBot/testing/issues`, {
       method: 'POST',
       headers: {
         Accept: 'application/vnd.github+json',
         // this token got reset so don't waste your time ;)
-        Authorization: 'token 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'
+        // Editor's note: Definetely intentionally reset
+        Authorization: githubToken
       },
       data: {
         title: title,
@@ -45,12 +57,12 @@ module.exports = {
         content: 'I could not access the GitHub API!',
         ephemeral: true
       })
-    const embed = {
-      color: resolveColor(accent),
+    const embed: APIEmbed = {
+      color: accent ? resolveColor(accent as HexColorString): undefined,
       title: 'Created a new issue!',
-      thumbnail: {
-        url: thumbnail
-      },
+      thumbnail: thumbnail ? {
+        url: thumbnail.url
+      }: undefined,
       fields: [
         {
           name: 'Title',
@@ -78,3 +90,5 @@ module.exports = {
     })
   }
 }
+
+export default modal;
