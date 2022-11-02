@@ -1,3 +1,8 @@
+/*
+  This file will probably continue working, but I didn't port it to typescript/ES Module since it
+  is unused. If you'd like to use it please port it to typescript.
+*/
+
 module.exports = interaction => {
   const requiredPerms = [
     'KICK_MEMBERS',

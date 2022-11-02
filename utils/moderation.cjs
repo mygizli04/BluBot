@@ -1,3 +1,10 @@
+/*
+  This file is broken! Since it is unused, I did not port it to typescript/ES Module 
+  but since it relies on a now ES Module it will not be able to import anything. Please
+  port this file to typescript if you'd like to use it, or use ES Modules for a 
+  temporary fix.
+*/
+
 const log = require('./log')
 
 // unused for now, don't look
@@ -51,7 +58,7 @@ async function purge(channel, amount, reason, target) {
 
 module.exports = {
   checkBotPerms: interaction => {
-    return require('./checkBotPerms')(interaction)
+    return require('./checkBotPerms.cjs')(interaction)
   },
   checkUserPerms: interaction => {
     return require('./checkUserPerms')(interaction)
