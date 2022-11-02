@@ -3,5 +3,5 @@ import type { CommandInteraction, ContextMenuCommandBuilder, SlashCommandBuilder
 export default interface Command {
     data: ContextMenuCommandBuilder | SlashCommandBuilder
 
-    execute(interaction: CommandInteraction): Promise<unknown>;
+    execute(interaction: CommandInteraction): Promise<void>;
 }

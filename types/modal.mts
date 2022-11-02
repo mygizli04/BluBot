@@ -2,5 +2,5 @@ import type { CommandInteraction, Interaction, ModalSubmitInteraction } from "di
 
 export default interface Modal {
     id: string,
-    execute(interaction: ModalSubmitInteraction): Promise<unknown>
+    execute(interaction: ModalSubmitInteraction): Promise<void>
 }
