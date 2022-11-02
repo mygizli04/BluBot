@@ -1,6 +1,5 @@
 import { Events } from 'discord.js';
-import fs from 'fs';
-import { check as phishing } from "../filters/phishing"
+import phishing from "../filters/phishing.mjs"
 import Event from '../types/event.mjs';
 import log from '../utils/log.mjs';
 
