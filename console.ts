@@ -3,7 +3,7 @@ import sleep from './utils/sleep.js';
 
 let minimal = false
 
-async function motd(tag: string) {
+async function motd(tag?: string) {
   !minimal && console.clear()
   const ascii = `______ _      ______       _   
 | ___ \\ |     | ___ \\     | |  
@@ -59,17 +59,15 @@ export default {
         const keyStr = key.toString();
         if (keyStr === '\u0003') process.exit()
         // If the key isn't a key of commands, ignore it
-        if (!Object.keys(commands).includes(keyStr)) {
-          // @ts-ignore-error | It's ok, we just checked that keyStr is a valid key in the if statement
-          return commands[keyStr]()
+        if (Object.keys(commands).includes(keyStr)) {
+          return commands[keyStr as keyof typeof commands]()
         }
       })
     } else {
       process.stdin.on('data', line => {
         const lineStr = line.toString().trim()
-        if (!Object.keys(commands).includes(lineStr)) {
-          // @ts-ignore-error | It's ok, we just checked that keyStr is a valid key in the if statement
-          return commands[keyStr]()
+        if (Object.keys(commands).includes(lineStr)) {
+          return commands[lineStr as keyof typeof commands]()
         }
       })
     }
