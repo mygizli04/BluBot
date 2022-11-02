@@ -1,4 +1,4 @@
-import { APIEmbed, Guild, HexColorString, resolveColor, TextChannel, User } from 'discord.js';
+import { APIEmbed, Guild, HexColorString, resolveColor, TextChannel } from 'discord.js';
 import { PunishmentInfo, PunishmentType, TemplateInfo, TemplateType } from '../types/log/index.js';
 
 import { getConfig } from '../types/config.js';
@@ -7,7 +7,6 @@ import { validateChannelTemplateInfo, validateMessageTemplateInfo, validateModer
 import { validateBanPunishmentInfo, validateKickPunishmentInfo, validateLockPunishmentInfo, validateMessageDeletePunishmentInfo, validateMessageEditPunishmentInfo, validatePhishPunishmentInfo, validatePurgePunishmentInfo, validateTimeoutPunishmentInfo, validateUnBanPunishmentInfo, validateUnlockPunishmentInfo, validateUnTimeoutPunishmentInfo } from '../types/log/info/index.js';
 
 const { customization, channels } = await getConfig();
-const accent = customization?.accent;
 const colors = customization?.colors;
 const logs = channels?.logs;
 

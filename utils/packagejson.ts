@@ -12,7 +12,7 @@ const dependencies: Dependency[] = []
 Object.entries<string>(packageJson.dependencies).forEach(d => {
   dependencies.push({
     name: d[0],
-    version: d[1]
+    version: d[1].replace("^", "")
   })
 });
 
