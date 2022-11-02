@@ -1,4 +1,3 @@
-import { DMInfo } from "../index.js";
 import { TemplateInfo, validateTemplateInfo } from "../template/info.js";
 
 export type BanDMInfo = TemplateInfo;

@@ -1,4 +1,4 @@
-import { Channel, TextChannel, User } from "discord.js";
+import { TextChannel, User } from "discord.js";
 import { ChannelTemplateInfo, MessageTemplateInfo, ModerateTemplateInfo, validateChannelTemplateInfo, validateMessageTemplateInfo, validateModerateTemplateInfo } from "../template/info.js";
 
 export interface BanPunishmentInfo extends ModerateTemplateInfo {
