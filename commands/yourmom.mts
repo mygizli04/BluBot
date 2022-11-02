@@ -1,19 +1,25 @@
-const { SlashCommandBuilder } = require('discord.js')
-const axios = require('axios').default
-const {
-  customization: { accent }
-} = require('../config.json')
+import { HexColorString, resolveColor, SlashCommandBuilder } from 'discord.js';
+import axios from "axios";
+import { getConfig } from '../types/config.mjs';
+import Command from '../types/command.mjs';
 
-module.exports = {
+const { customization } = await getConfig();
+const accent = customization?.accent;
+
+interface Joke {
+  joke: string
+}
+
+const command: Command = {
   data: new SlashCommandBuilder().setName('yourmom').setDescription("yo momma so phat she couldn't run this command"),
   async execute(interaction) {
-    const joke = await axios.get('https://api.yomomma.info').catch(() => null)
-    if (joke?.data.joke)
+    const joke = await axios.get<Joke>('https://api.yomomma.info');
+    if (joke.data.joke)
       interaction.reply({
         embeds: [
           {
             title: joke.data.joke,
-            color: accent,
+            color: accent ? resolveColor(accent as HexColorString) : undefined,
             footer: {
               text: `Powered by api.yomomma.info`
             }
@@ -25,7 +31,7 @@ module.exports = {
         embeds: [
           {
             title: 'Yo momma so phat she rolled over the cables and broke them',
-            color: accent,
+            color: accent ? resolveColor(accent as HexColorString) : undefined,
             footer: {
               text: 'I was not able to fetch a joke from api.yomomma.info.'
             }
@@ -35,3 +41,5 @@ module.exports = {
     }
   }
 }
+
+export default command;
