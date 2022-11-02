@@ -1,6 +1,6 @@
-import type { Interaction } from "discord.js";
+import type { CommandInteraction, Interaction, ModalSubmitInteraction } from "discord.js";
 
 export default interface Modal {
     id: string,
-    execute(interaction: Interaction): Promise<unknown>
+    execute(interaction: ModalSubmitInteraction): Promise<unknown>
 }

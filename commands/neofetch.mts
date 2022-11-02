@@ -1,5 +1,6 @@
 import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { Instance } from 'chalk';
+import chalkModule from 'chalk';
+const { Instance } = chalkModule;
 import os from 'os';
 import { getDependency, getVersion, getPackageAmount } from '../utils/packagejson.mjs';
 import Command from '../types/command.mjs';

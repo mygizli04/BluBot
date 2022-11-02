@@ -10,7 +10,8 @@ export interface Config {
     token: string | null,
     customization?: CustomizationConfig,
     modRoles: number[],
-    channels: ChannelsConfig;
+    channels: ChannelsConfig,
+    githubToken?: string
 }
 
 export function validateConfig (config: Config): config is Config {
@@ -64,9 +65,11 @@ let config: FullConfig;
 
 export async function getConfig(): Promise<FullConfig> {
     if (!config) {
-        config = JSON.parse(await fs.readFile("./config.json", "utf-8"));
+        config = JSON.parse(await fs.readFile(configPath, "utf-8"));
         if (!validateConfig(config)) throw new Error("Invalid config");
     }
 
     return config as FullConfig;
 }
+
+export const configPath = "./config.json";

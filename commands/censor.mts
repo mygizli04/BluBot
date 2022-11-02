@@ -19,6 +19,13 @@ function validateCensoredWord(word: any): word is CensoredWord {
   return true;
 }
 
+try {
+  await fs.access("./databases/censored.json");
+}
+catch {
+  await fs.writeFile("./databases/censored.json", "[]");
+}
+
 const censored: CensoredWord[] = JSON.parse(await fs.readFile("./databases/censored.json", "utf-8"));
 
 censored.forEach(word => {

@@ -58,6 +58,8 @@ if (customColors === 'y') {
   if (current.customization.colors!.bad === '') delete current.customization.colors!.bad;
 }
 if (customColors === "y") console.log("Alright, i'll use the default colors. ");
+console.log("Could I also have your github token please? Leave blank for no github integration.");
+current.githubToken = await readline();
 console.log('Now, time to set up your moderation roles. Enter all your moderation role IDs here, separated by a comma.');
 current.modRoles = (await readline()).split(',').map(r => parseInt(r.trim()));
 console.log("Got that. Now enter the channel you'd like me to send logs to:");

@@ -6,7 +6,9 @@ import bconsole from './console.mjs';
 import Command from "./types/command.mjs"
 import Modal from './types/modal.mjs';
 
-if (!fs.existsSync('./config.json')) {
+import { getConfig, configPath } from './types/config.mjs';
+
+if (!fs.existsSync(configPath)) {
   console.log("Looks like you haven't set up the bot yet! Please run 'npm run setup' and try again.")
   process.exit()
 }
@@ -20,16 +22,16 @@ const client = new Client({
 const commands = new Collection<string, Command>()
 const modals = new Collection<string, Modal>()
 
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
-const modalFiles = fs.readdirSync('./modals').filter(file => file.endsWith('.js'))
+const commandFiles = fs.readdirSync('./out/commands').filter(file => file.endsWith('.mjs'))
+const modalFiles = fs.readdirSync('./out/modals').filter(file => file.endsWith('.mjs'))
 
 for (const file of commandFiles) {
-  const command: Command = await import(`./commands/${file}`)
+  const command: Command = (await import(`./commands/${file}`)).default
   commands.set(command.data.name, command)
 }
 
 for (const file of modalFiles) {
-  const modal = require(`./modals/${file}`)
+  const modal: Modal = (await import(`./modals/${file}`)).default
   modals.set(modal.id, modal)
 }
 
@@ -39,7 +41,7 @@ client.once(Events.ClientReady, async c => {
   deploy(c.user.id)
 })
 
-for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js') || file.endsWith(".mjs"))) {
+for (const eventFile of [] /*fs.readdirSync('./events').filter(file => file.endsWith('.js'))*/) {
   const event = require(`./events/${eventFile}`)
   client.on(event.event, event.listener)
 }
@@ -70,5 +72,5 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 })
 
-const { token } = require('./config.json')
+const { token } = await getConfig();
 client.login(token)

@@ -61,9 +61,7 @@ const command: Command = {
     })
     const dm = await directMessage(interaction.guild!, target, 'ban', {
       reason,
-      moderator: {
-        id: interaction.user.id
-      }
+      moderator: interaction.user
     })
     if (!dm)
       await interaction.followUp({
