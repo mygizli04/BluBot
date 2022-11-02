@@ -1,4 +1,4 @@
-import { APIEmbed, APIUnavailableGuild, Guild, HexColorString, resolveColor, User } from "discord.js";
+import { APIEmbed, Guild, HexColorString, resolveColor, User } from "discord.js";
 import { getConfig } from "../types/config.js";
 import { DMInfo, DMType } from "../types/directMessage/index.js";
 import { validateBanDMInfo, validateKickDMInfo, validateTimeoutDMInfo } from "../types/directMessage/info/info.js";
