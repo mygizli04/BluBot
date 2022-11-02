@@ -82,9 +82,12 @@ const command: Command = {
       ''
     ]
     const offset = Math.floor((ascii.length - info.length) / 2)
-    return minimal
-      ? interaction.reply(`\`\`\`ansi\n \n  ${info.join('\n  ')}\n \`\`\``)
-      : interaction.reply(`\`\`\`ansi\n${chalk.blue(ascii.map((a, i) => '  ' + a + '  ' + (info[i - offset] || '')).join('\n'))}\n\n\n\`\`\``)
+    if (minimal) {
+      interaction.reply(`\`\`\`ansi\n \n  ${info.join('\n  ')}\n \`\`\``)
+    }
+    else {
+      interaction.reply(`\`\`\`ansi\n${chalk.blue(ascii.map((a, i) => '  ' + a + '  ' + (info[i - offset] || '')).join('\n'))}\n\n\n\`\`\``)
+    }
   }
 }
 
