@@ -1,5 +1,4 @@
 import { APIEmbed, Guild, HexColorString, resolveColor, TextChannel, User } from 'discord.js';
-import { PunishmentEmbedTypes, PunishmentMessageInfo } from './directMessage.mjs';
 import { PunishmentInfo, PunishmentType, TemplateInfo, TemplateType } from '../types/log/index.mjs';
 
 import { getConfig } from '../types/config.mjs';
