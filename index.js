@@ -4,6 +4,7 @@ const deploy = require('./utils/deploy')
 const bconsole = require('./console')
 const { cacheAll } = require('./utils/reactionroles')
 const config = require('./utils/config')
+const release = require('./utils/release')
 const { token } = config.get()
 
 if (!fs.existsSync('./databases')) fs.mkdirSync('./databases')
@@ -45,6 +46,7 @@ client.once(Events.ClientReady, async c => {
   bconsole.motd(c.user.tag)
   deploy(c.user.id)
   cacheAll(client)
+  release.startCheckLoop(client)
 })
 
 client.on(Events.Error, error => {
