@@ -6,7 +6,7 @@ const config = require('./config')
 function generateEmbed(data) {
   const embed = {
     color: config.getColor('accent'),
-    title: `New ${data.type}! ${data.previous.version} ➜ ${data.version}`,
+    title: `New ${data.type}! ${data.previous?.version ? `${data.previous.version} ➜ ` : ''}${data.version}`,
     fields: [
       {
         name: 'Release Date',
