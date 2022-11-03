@@ -3,11 +3,8 @@ const fs = require('fs')
 const deploy = require('./utils/deploy')
 const bconsole = require('./console')
 const { cacheAll } = require('./utils/reactionroles')
-
-if (!fs.existsSync('./config.json')) {
-  console.log("Looks like you haven't set up the bot yet! Please run 'npm run setup' and try again.")
-  process.exit()
-}
+const config = require('./utils/config')
+const { token } = config.get()
 
 if (!fs.existsSync('./databases')) fs.mkdirSync('./databases')
 
@@ -17,9 +14,11 @@ const client = new Client({
 
 client.commands = new Collection()
 client.modals = new Collection()
+client.autoComplete = new Collection()
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'))
 const modalFiles = fs.readdirSync('./modals').filter(file => file.endsWith('.js'))
+const autoCompleteFiles = fs.readdirSync('./autocomplete').filter(file => file.endsWith('.js'))
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`)
@@ -31,6 +30,16 @@ for (const file of modalFiles) {
   client.modals.set(modal.id, modal)
 }
 
+for (const file of autoCompleteFiles) {
+  const autoComplete = require(`./autocomplete/${file}`)
+  client.autoComplete.set(autoComplete.id, autoComplete)
+}
+
+for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js'))) {
+  const event = require(`./events/${eventFile}`)
+  client.on(event.event, event.listener)
+}
+
 bconsole.init(process.argv[2])
 client.once(Events.ClientReady, async c => {
   bconsole.motd(c.user.tag)
@@ -38,46 +47,21 @@ client.once(Events.ClientReady, async c => {
   cacheAll(client)
 })
 
-for (const eventFile of fs.readdirSync('./events').filter(file => file.endsWith('.js'))) {
-  const event = require(`./events/${eventFile}`)
-  client.on(event.event, event.listener)
-}
-
-for (const autoCompleteFile of fs.readdirSync('./autocomplete').filter(file => file.endsWith('.js'))) {
-  const autoComplete = require(`./autocomplete/${autoCompleteFile}`)
-  client.on(Events.InteractionCreate, interaction => {
-    if (!interaction.isAutocomplete()) return
-    if (interaction.commandName !== autoComplete.id) return
-    autoComplete.execute(interaction)
-  })
-}
-
 client.on(Events.Error, error => {
   console.log(error)
 })
 
 client.on(Events.InteractionCreate, async interaction => {
-  if (interaction.isAutocomplete()) return
   if (interaction.isCommand()) {
     const command = client.commands.get(interaction.commandName)
-    if (command) {
-      try {
-        await command.execute(interaction)
-      } catch (error) {
-        console.error(error)
-      }
-    }
+    if (command) await command.execute(interaction).catch(console.error)
   } else if (interaction.isModalSubmit()) {
     const modal = client.modals.get(interaction.customId)
-    if (modal) {
-      try {
-        await modal.execute(interaction)
-      } catch (error) {
-        console.error(error)
-      }
-    }
+    if (modal) await modal.execute(interaction).catch(console.error)
+  } else if (interaction.isAutocomplete()) {
+    const autoComplete = client.autoComplete.get(interaction.commandName)
+    if (autoComplete) await autoComplete.execute(interaction).catch(console.error)
   }
 })
 
-const { token } = require('./config.json')
 client.login(token)
