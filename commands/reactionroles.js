@@ -54,7 +54,7 @@ module.exports = {
           content: 'That message and emoji combo already has a reaction role!',
           ephemeral: true
         })
-      reactionroles.add(emoji, messageId, role.id, channelId, interaction.options.getString('emoji'))
+      reactionroles.add(emoji, messageId, role.id, channelId, interaction.options.getString('emoji'), interaction.client)
       return interaction.reply({
         content: `Added reaction role with emoji ${interaction.options.getString('emoji')}, [this message](${interaction.options.getString('message')}) and role <@&${role.id}>`,
         ephemeral: true
@@ -82,7 +82,10 @@ module.exports = {
         title: `Reaction roles in ${interaction.guild.name}`,
         color: config.getColor('accent'),
         description: roles
-          .map(r => `[Jump to Message](https://discord.com/channels/${interaction.guild.id}/${r.channelId}/${r.id})\n${r.roles.map(ro => `${ro.emojiName}: <@&${ro.role}>`).join('\n')}`)
+          .map(
+            r =>
+              `[Jump to Message](https://discord.com/channels/${interaction.guild.id}/${r.channelId}/${r.id})\n${r.roles.map(ro => `${ro.emojiName}: <@&${ro.role}>`).join('\n')}`
+          )
           .join('\n\n')
       }
       return interaction.reply({

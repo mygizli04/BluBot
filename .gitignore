@@ -5,5 +5,4 @@ databases/*
 config.prod.json
 config.test.json
 config.json
-
 .vscode/

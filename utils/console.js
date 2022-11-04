@@ -1,5 +1,5 @@
 const chalk = require('chalk')
-const sleep = require('./utils/sleep')
+const sleep = require('./sleep')
 
 let minimal = false
 
@@ -46,8 +46,8 @@ const commands = {
 }
 
 module.exports = {
-  init: arg => {
-    if (arg === '--minimal') minimal = true
+  init: () => {
+    if (process.argv[2] === '--minimal') minimal = true
     !minimal && console.clear()
     console.log(chalk.yellow('Starting BluBot...'))
     if (!minimal) {

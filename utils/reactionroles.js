@@ -6,7 +6,8 @@ function ensureDatabase() {
   try {
     JSON.parse(fs.readFileSync('./databases/reactionroles.json'))
   } catch {
-    // show a warning first?
+    fs.writeFileSync('./databases/reactionroles.bak.json', fs.readFileSync('./databases/reactionroles.json'))
+    console.log('Your reaction role database was corrupted, so we had to reset it. You can find a backup in ./databases/reactionroles.bak.json')
     fs.writeFileSync('./databases/reactionroles.json', '[]')
   }
 }
@@ -22,7 +23,7 @@ function getDatabase() {
 }
 
 module.exports = {
-  add: (emoji, id, role, channel, emojiName) => {
+  add: async (emoji, id, role, channel, emojiName, client) => {
     ensureDatabase()
     const database = getDatabase()
     const foundIndex = database.findIndex(d => d.id == id)
@@ -45,6 +46,7 @@ module.exports = {
         emojiName
       })
     }
+    await (await client.channels.fetch(channel)).messages.fetch(id)
     writeDatabase(database)
   },
   remove: (emoji, id) => {
