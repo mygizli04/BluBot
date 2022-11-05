@@ -27,6 +27,12 @@ module.exports = {
         .setName('edit')
         .setDescription('Edit a tag')
         .addStringOption(option => option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true))
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('faqtoggle')
+        .setDescription('Toggle specified item to appear on the FAQ list')
+        .addStringOption(option => option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true))
     ),
 
   async execute(interaction) {
@@ -83,6 +89,7 @@ module.exports = {
 
       tag.remove(name)
       interaction.reply({ content: `Removed tag ${name}.`, ephemeral: true })
+      tag.updateFAQList(interaction.client)
     } else if (subcommand === 'list') {
       const tagList = Object.keys(tag.getAll())
       if (tagList.length === 0) return interaction.reply({ content: 'There are no tags.', ephemeral: true })
@@ -165,6 +172,21 @@ module.exports = {
       modal.addComponents(new ActionRowBuilder().addComponents(nameInput), new ActionRowBuilder().addComponents(contentInput), new ActionRowBuilder().addComponents(imageInput))
 
       await interaction.showModal(modal)
+    } else if (subcommand === 'faqtoggle') {
+      if (!checkUserPerms(interaction)) {
+        return interaction.reply({
+          content: 'You do not have permission to do that!',
+          ephemeral: true
+        })
+      }
+
+      if (!config.get().channels.faq) return interaction.reply({ content: 'An FAQ channel has not been configured.', ephemeral: true })
+      const name = interaction.options.getString('name')
+      if (!tag.get(name)) return interaction.reply({ content: `A tag with the name ${name} does not exist.`, ephemeral: true })
+      const wasFAQItem = tag.get(name).faqitem || false
+      tag.modify(name, null, null, wasFAQItem ? false : true)
+      interaction.reply({ content: wasFAQItem ? `Removed tag ${name} from the FAQ list.` : `Added tag ${name} to the FAQ list.`, ephemeral: true })
+      tag.updateFAQList(interaction.client)
     }
   }
 }

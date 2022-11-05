@@ -10,5 +10,6 @@ module.exports = {
 
     tag.modify(name, content, image)
     interaction.reply({ content: `Edited tag ${name}.`, ephemeral: true })
+    tag.updateFAQList(interaction.client)
   }
 }
