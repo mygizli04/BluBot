@@ -21,6 +21,7 @@ module.exports = {
         .setDescription('Get a tag')
         .addStringOption(option => option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true))
         .addUserOption(option => option.setName('mention').setDescription('User to mention'))
+        .addBooleanOption(option => option.setName('preview').setDescription('Send tag as a preview instead of displaying it publicly'))
     )
     .addSubcommand(subcommand =>
       subcommand
@@ -106,6 +107,7 @@ module.exports = {
     } else if (subcommand === 'get') {
       const name = interaction.options.getString('name')
       const user = interaction.options.getUser('mention')
+      const preview = interaction.options.getBoolean('preview')
       const foundTag = tag.get(name)
       if (!foundTag) {
         // Shhhh, you didn't see anything.
@@ -125,7 +127,7 @@ module.exports = {
           url: foundTag.image
         }
       }
-      user ? interaction.reply({ content: `<@${user.id}>, take a look at this!`, embeds: [embed] }) : interaction.reply({ embeds: [embed] })
+      user ? interaction.reply({ content: `<@${user.id}>, take a look at this!`, embeds: [embed] }) : interaction.reply({ embeds: [embed], ephemeral: preview ?? false })
     } else if (subcommand === 'edit') {
       if (!checkUserPerms(interaction)) {
         return interaction.reply({
