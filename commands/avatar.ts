@@ -9,7 +9,7 @@ const command: Command = {
   data: new SlashCommandBuilder()
     .setName('avatar')
     .setDescription("Get your or another user's avatar")
-    .addUserOption(option => option.setName('target').setDescription('User to show avatar for')) as SlashCommandBuilder,
+    .addUserOption(option => option.setName('target').setDescription('User to get avatar for')) as SlashCommandBuilder,
   async execute(interaction) {
     const user = interaction.options.getUser('target') || interaction.user
     const avatar = (format: ImageExtension) => user.avatarURL({ extension: format })

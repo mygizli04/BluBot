@@ -37,7 +37,7 @@ const command: Command = {
 
     interaction.deferReply()
     
-    // my api ;)
+    // https://guides.bludood.com/apis/urban-dictionary-api
     const api = 'https://urbanapi.up.railway.app'
     const query = interaction.options.getString('query')
     const res = await axios.get<QueryReply>(`${api}/define/${query}`)

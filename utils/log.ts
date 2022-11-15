@@ -47,7 +47,7 @@ function getTemplate (name: TemplateType, info: TemplateInfo): Template {
           },
           {
             name: 'Message',
-            value: info.content
+            value: info.content || "Unknown"
           },
           {
             name: 'Channel',

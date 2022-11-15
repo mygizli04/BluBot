@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "setup": "node setup.js",
+    "setup": "node utils/setup.js",
     "transpile": "./node_modules/.bin/tsc -p ."
   },
   "author": "BluDood",

@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import sleep from './utils/sleep.js';
+import sleep from './sleep.js';
 
 let minimal = false
 
@@ -46,8 +46,8 @@ const commands = {
 }
 
 export default {
-  init: (arg: string) => {
-    if (arg === '--minimal') minimal = true
+  init: () => {
+    if (process.argv[2] === '--minimal') minimal = true
     !minimal && console.clear()
     console.log(chalk.yellow('Starting BluBot...'))
     if (!minimal) {

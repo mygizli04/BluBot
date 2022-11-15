@@ -2,7 +2,7 @@ import { Client, Collection, GatewayIntentBits, Events } from 'discord.js';
 import fs from 'fs/promises';
 import fileExists from "./utils/asyncFileExists.js";
 import deploy from './utils/deploy.js';
-import bconsole from './console.js';
+import bconsole from './utils/console.js';
 
 import Command from "./types/command.js"
 import Modal from './types/modal.js';
@@ -19,7 +19,7 @@ if (!await fileExists(configPath)) {
 if (!await fileExists('./databases')) await fs.mkdir('./databases')
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers]
 });
 
 const commands = new Collection<string, Command>()
@@ -42,6 +42,8 @@ bconsole.init(process.argv[2])
 client.once(Events.ClientReady, async c => {
   bconsole.motd(c.user.tag)
   deploy(c.user.id)
+  cacheAll(client)
+  release.startCheckLoop(client)
 })
 
 for (const eventFile of (await fs.readdir('./out/events')).filter(file => file.endsWith('.js'))) {

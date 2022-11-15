@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder, TextChannel } from 'discord.js';
+import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder, TextChannel, PermissionsBitField } from 'discord.js';
 import checkUserPerms from '../utils/checkUserPerms.js';
 import log from '../utils/log.js';
 
@@ -39,13 +39,13 @@ const command: Command = {
       interaction.reply('I cannot access that channel!');
       return;
     }
-    if (!channel.permissionsFor(interaction.guild!.roles.everyone).has('SendMessages')) {
+    if (!channel.permissionsFor(interaction.guild!.roles.everyone).has(PermissionsBitField.Flags.SendMessages)) {
       interaction.reply('This channel is already locked!');
       return;
     }
     try {
       channel.permissionOverwrites.edit(interaction.guild!.roles.everyone, {
-        SendMessages: false
+        [PermissionsBitField.Flags.SendMessages]: false
       })
       await interaction.reply({
         embeds: [
