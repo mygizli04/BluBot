@@ -54,7 +54,8 @@ export function validateColorCustomizationConfig (config: ColorCustomizationConf
 export interface ChannelsConfig {
     logs?: string,
     welcome?: string,
-    releases?: string
+    releases?: string,
+    faq?: string
 }
 
 export function validateChannelsConfig (config: ChannelsConfig): config is ChannelsConfig {

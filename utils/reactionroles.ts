@@ -13,7 +13,6 @@ import { Client, TextChannel } from 'discord.js';
  * Returns the parsed database if it is valid, otherwise returns null
  */
 async function ensureDatabase (file = readFileSync("./databases/reactionroles.json", "utf-8")): Promise<ReactionRole[] | null> {
-  // TODO: Replace with an *actual* check
   try {
     // Bite me lol
     var parsed: ReactionRole[] = JSON.parse(file);

@@ -66,6 +66,8 @@ console.log("Got that. Now enter the channel you'd like me to send logs to:");
 current.channels.logs = await readline();
 console.log("Alright, now enter what channel I should send UTM releases to:")
 current.channels.releases = await readline();
+console.log("And finally, enter the faq channel:")
+current.channels.faq = await readline();
 console.log(`
 Guild ID: ${current.guildId}
 Bot token: ${current.token}
