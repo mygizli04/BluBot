@@ -6,35 +6,22 @@ import { getConfig } from '../types/config.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
-import Command from '../types/command.js';
+import { SlashCommand } from '../types/command.js';
+import { authorizedOnly } from '../decorators/authorizedOnly.js';
 
 function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
   return interaction.commandType === ApplicationCommandType.ChatInput;
 }
 
-const command: Command = {
-  data: new SlashCommandBuilder()
+class Command implements SlashCommand {
+  data = new SlashCommandBuilder()
     .setName('lock')
     .setDescription('Lock a channel')
-    .addChannelOption(option => option.setName('channel').setDescription('Channel to lock')) as SlashCommandBuilder,
-  async execute(interaction) {
-    if (!checkUserPerms(interaction as Interaction)) {
-      interaction.reply({
-        content: 'You do not have permission to do that!',
-        ephemeral: true
-      });
-      return;
-    }
+    .addChannelOption(option => option.setName('channel').setDescription('Channel to lock')) as SlashCommandBuilder;
 
-    if (!checkCommandType(interaction)) {
-      interaction.reply({
-        content: 'This command is only available as a slash command.',
-        ephemeral: true
-      });
-      return;
-    }
-
-    const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel
+  @authorizedOnly()
+  async execute(interaction: ChatInputCommandInteraction) {
+    const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel;
     if (!channel) {
       interaction.reply('I cannot access that channel!');
       return;
@@ -45,25 +32,25 @@ const command: Command = {
     }
     try {
       channel.permissionOverwrites.edit(interaction.guild!.roles.everyone, {
-        [PermissionsBitField.Flags.SendMessages]: false
-      })
+        [Number(PermissionsBitField.Flags.SendMessages)]: false
+      });
       await interaction.reply({
         embeds: [
           {
             title: `#${channel.name} locked.`,
-            color: accent ? resolveColor(accent as HexColorString): undefined
+            color: accent ? resolveColor(accent as HexColorString) : undefined
           }
         ]
-      })
+      });
       log(interaction.guild!, 'lock', {
         channel,
         moderator: interaction.user
-      })
+      });
     } catch (error) {
-      console.log(error)
-      interaction.reply('I cannot lock that channel!')
+      console.log(error);
+      interaction.reply('I cannot lock that channel!');
     }
   }
 }
 
-export default command;
+export default new Command();

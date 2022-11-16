@@ -44,7 +44,7 @@ const command: Command = {
     }
     try {
       channel.permissionOverwrites.edit(interaction.guild!.roles.everyone, {
-        [PermissionsBitField.Flags.SendMessages]: null
+        [Number(PermissionsBitField.Flags.SendMessages)]: null
       })
       await interaction.reply({
         embeds: [

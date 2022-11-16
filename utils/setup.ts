@@ -1,6 +1,6 @@
 import fs from 'fs'; // It's fine that this is sync since there's nothing else going on.
 
-import { Config, validateConfig } from './types/config.js';
+import { Config, validateConfig } from '../types/config.js';
 
 const current: Config = {
   guildId: null,
@@ -59,11 +59,13 @@ console.log("Could I also have your github token please? Leave blank for no gith
 current.githubToken = await readline();
 console.log('Now, time to set up your moderation roles. Enter all your moderation role IDs here, separated by a comma.');
 current.modRoles = (await readline()).split(',').map(r => parseInt(r.trim()));
+if (!current.channels) current.channels = {};
 console.log("Now enter the channel you'd like me to send welcome message to. Leave blank to disable.")
 current.channels.welcome = (await readline()).trim()
 console.log("Got that. Now enter the channel you'd like me to send logs to:");
-if (!current.channels) current.channels = {};
 current.channels.logs = await readline();
+console.log("Alright, now enter what channel I should send UTM releases to:")
+current.channels.releases = await readline();
 console.log(`
 Guild ID: ${current.guildId}
 Bot token: ${current.token}

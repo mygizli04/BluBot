@@ -3,30 +3,18 @@ import chalkModule from 'chalk';
 const { Instance } = chalkModule;
 import os from 'os';
 import { getDependency, getVersion, getPackageAmount } from '../utils/packagejson.js';
-import Command from '../types/command.js';
+import { SlashCommand } from '../types/command.js';
 
 const chalk = new Instance({
   level: 1
 })
 
-function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
-  return interaction.commandType === ApplicationCommandType.ChatInput;
-}
-
-const command: Command = {
+const command: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('neofetch')
     .setDescription('Information about this bot')
     .addBooleanOption(option => option.setName('minimal').setDescription('Show minimal message without ASCII art. Better for mobile screens.')) as SlashCommandBuilder,
   async execute(interaction) {
-    if (!checkCommandType(interaction)) {
-      interaction.reply({
-        content: 'This command is only available as a slash command.',
-        ephemeral: true
-      });
-      return;
-    }
-    
     const minimal = interaction.options.getBoolean('minimal')
     let uptime = process.uptime()
     const hours = Math.floor(uptime / 3600)

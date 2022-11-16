@@ -3,6 +3,8 @@ import fs from 'fs/promises';
 import fileExists from "./utils/asyncFileExists.js";
 import deploy from './utils/deploy.js';
 import bconsole from './utils/console.js';
+import { cacheAll } from './utils/reactionroles.js';
+import * as release from './utils/release.js';
 
 import Command from "./types/command.js"
 import Modal from './types/modal.js';
@@ -38,7 +40,7 @@ for (const file of modalFiles) {
   modals.set(modal.id, modal)
 }
 
-bconsole.init(process.argv[2])
+bconsole.init()
 client.once(Events.ClientReady, async c => {
   bconsole.motd(c.user.tag)
   deploy(c.user.id)

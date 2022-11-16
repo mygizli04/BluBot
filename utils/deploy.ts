@@ -13,7 +13,7 @@ export default async function deploy(id: string) {
   const commandFiles = (await fs.readdir('./commands')).filter(file => file.endsWith('.js'))
 
   for (const file of commandFiles) {
-    const command = require(`../commands/${file}`)
+    const command = (await import(`../commands/${file}`)).default
     commands.push(command.data.toJSON())
   }
   const commandsHash = crypto.createHash('sha256').update(JSON.stringify(commands)).digest('hex')

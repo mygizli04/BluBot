@@ -1,18 +1,18 @@
-import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, HexColorString, resolveColor, SlashCommandBuilder } from 'discord.js';
 import fs from 'fs/promises';
-import checkUserPerms from '../utils/checkUserPerms.js';
 
 import { getConfig } from '../types/config.js';
-import Command from '../types/command.js';
+import { SlashCommand } from '../types/command.js';
+import { authorizedOnly } from '../decorators/authorizedOnly.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
 interface CensoredWord {
   user: string,
-  word: string
+  word: string;
 }
 
-function validateCensoredWord(word: any): word is CensoredWord {
+function validateCensoredWord (word: any): word is CensoredWord {
   if (typeof word.user !== "string") return false;
   if (typeof word.word !== "string") return false;
 
@@ -30,16 +30,12 @@ const censored: CensoredWord[] = JSON.parse(await fs.readFile("./databases/censo
 
 censored.forEach(word => {
   if (!validateCensoredWord(word)) {
-    throw new Error("Cannot validate censored word database!")
+    throw new Error("Cannot validate censored word database!");
   }
-})
+});
 
-function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
-  return interaction.commandType === ApplicationCommandType.ChatInput;
-}
-
-const command: Command = {
-  data: new SlashCommandBuilder()
+class Command implements SlashCommand {
+  data = new SlashCommandBuilder()
     .setName('censor')
     .setDescription('Configure censored words')
     .addSubcommand(subcommand =>
@@ -54,26 +50,10 @@ const command: Command = {
         .setDescription('Remove a censored word')
         .addStringOption(option => option.setName('word').setDescription('The word to remove').setRequired(true))
     )
-    .addSubcommand(subcommand => subcommand.setName('list').setDescription('List all censored words')) as SlashCommandBuilder,
+    .addSubcommand(subcommand => subcommand.setName('list').setDescription('List all censored words')) as SlashCommandBuilder;
 
-  async execute (interaction) {
-
-    if (!checkUserPerms(interaction as Interaction)) {
-      interaction.reply({
-        content: 'You do not have permission to do that!',
-        ephemeral: true
-      });
-      return;
-    }
-
-    if (!checkCommandType(interaction)) {
-      interaction.reply({
-        content: 'This command is only available as a slash command.',
-        ephemeral: true
-      });
-      return;
-    }
-
+  @authorizedOnly()
+  async execute (interaction: ChatInputCommandInteraction) {
     const word = interaction.options.getString('word', true).toLowerCase();
 
     if (interaction.options.getSubcommand() === 'add') {
@@ -131,6 +111,6 @@ const command: Command = {
       return;
     }
   }
-};
+}
 
-export default command;
+export default new Command();

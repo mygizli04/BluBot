@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "setup": "node utils/setup.js",
+    "start": "node out/index.js",
+    "setup": "node out/utils/setup.js",
     "transpile": "./node_modules/.bin/tsc -p ."
   },
   "author": "BluDood",
@@ -17,6 +17,8 @@
     "discord.js": "^14.6.0"
   },
   "devDependencies": {
+    "@octokit/types": "^8.0.0",
+    "@types/node": "^18.11.9",
     "typescript": "^4.8.4"
   }
 }

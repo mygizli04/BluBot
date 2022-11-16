@@ -1,11 +1,11 @@
-import { HexColorString, ImageExtension, resolveColor, SlashCommandBuilder } from 'discord.js';
-import Command from '../types/command.js';
+import { ChatInputCommandInteraction, HexColorString, ImageExtension, resolveColor, SlashCommandBuilder } from 'discord.js';
+import { SlashCommand } from '../types/command.js';
 import { getConfig } from '../types/config.js';
 
 const { customization } = await getConfig();
 let accent = customization?.accent;
 
-const command: Command = {
+const command: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('avatar')
     .setDescription("Get your or another user's avatar")

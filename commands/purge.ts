@@ -3,7 +3,8 @@ import checkUserPerms from '../utils/checkUserPerms.js';
 import log from '../utils/log.js';
 
 import { getConfig } from '../types/config.js';
-import Command from '../types/command.js';
+import { SlashCommand } from '../types/command.js';
+import { authorizedOnly } from '../decorators/authorizedOnly.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
@@ -11,42 +12,28 @@ function checkCommandType (interaction: CommandInteraction): interaction is Chat
   return interaction.commandType === ApplicationCommandType.ChatInput;
 }
 
-const command: Command = {
-  data: new SlashCommandBuilder()
-    .setName('purge')
-    .setDescription('Purge messages.')
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('channel')
-        .setDescription('Purge messages by channel')
-        .addNumberOption(option => option.setName('amount').setDescription('Amount of messages to purge (max 100)').setRequired(true))
-        .addChannelOption(option => option.setName('channel').setDescription('Channel to purge messages in'))
-    )
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('user')
-        .setDescription('Purge messages by user')
-        .addUserOption(option => option.setName('user').setDescription('User to purge messages for').setRequired(true))
-        .addNumberOption(option => option.setName('amount').setDescription('Amount of messages to purge (max 100)').setRequired(true))
-        .addChannelOption(option => option.setName('channel').setDescription('Channel to purge messages in'))
-    ) as SlashCommandBuilder,
-  async execute(interaction) {
-    if (!checkUserPerms(interaction as Interaction)) {
-      interaction.reply({
-        content: 'You do not have permission to do that!',
-        ephemeral: true
-      });
-      return;
-    }
+class Command implements SlashCommand {
+  data = new SlashCommandBuilder()
+  .setName('purge')
+  .setDescription('Purge messages.')
+  .addSubcommand(subcommand =>
+    subcommand
+      .setName('channel')
+      .setDescription('Purge messages by channel')
+      .addNumberOption(option => option.setName('amount').setDescription('Amount of messages to purge (max 100)').setRequired(true))
+      .addChannelOption(option => option.setName('channel').setDescription('Channel to purge messages in'))
+  )
+  .addSubcommand(subcommand =>
+    subcommand
+      .setName('user')
+      .setDescription('Purge messages by user')
+      .addUserOption(option => option.setName('user').setDescription('User to purge messages for').setRequired(true))
+      .addNumberOption(option => option.setName('amount').setDescription('Amount of messages to purge (max 100)').setRequired(true))
+      .addChannelOption(option => option.setName('channel').setDescription('Channel to purge messages in'))
+  ) as SlashCommandBuilder
 
-    if (!checkCommandType(interaction)) {
-      interaction.reply({
-        content: 'This command is only available as a slash command.',
-        ephemeral: true
-      });
-      return;
-    }
-
+  @authorizedOnly()
+  async execute(interaction: ChatInputCommandInteraction) {
     const amount = interaction.options.getNumber('amount')!;
     const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel
     const user = interaction.options.getUser('user')
@@ -109,4 +96,4 @@ const command: Command = {
   }
 }
 
-export default command;
+export default new Command();

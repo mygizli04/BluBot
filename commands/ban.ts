@@ -1,47 +1,28 @@
-import { ApplicationCommandType, ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder } from 'discord.js';
-import Command from '../types/command.js';
+import { ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder } from 'discord.js';
+import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { SlashCommand } from '../types/command.js';
 
 import { getConfig } from '../types/config.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
-import checkUserPerms from '../utils/checkUserPerms.js';
 import directMessage from '../utils/directMessage.js';
 import log from '../utils/log.js';
 
-function checkCommandType(interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
-  return interaction.commandType === ApplicationCommandType.ChatInput;
-}
-
-const command: Command = {
-  data: new SlashCommandBuilder()
+class Command implements SlashCommand {
+  data = new SlashCommandBuilder()
     .setName('ban')
     .setDescription('Ban a member.')
     .addUserOption(option => option.setName('target').setDescription('User to ban').setRequired(true))
     .addStringOption(option => option.setName('reason').setDescription('Reason for the ban'))
-    .addNumberOption(option => option.setName('deletedays').setDescription('Days to delete messages')) as SlashCommandBuilder,
+    .addNumberOption(option => option.setName('deletedays').setDescription('Days to delete messages')) as SlashCommandBuilder;
 
-  async execute(interaction) {
-    if (!checkUserPerms(interaction as Interaction)) {
-      interaction.reply({
-        content: 'You do not have permission to do that!',
-        ephemeral: true
-      });
-      return;
-    }
-
-    if (!checkCommandType(interaction)) {
-      interaction.reply({
-        content: 'This command is only available as a slash command.',
-        ephemeral: true
-      });
-      return;
-    }
-
-    const target = interaction.options.getUser('target')!
-    const reason = interaction.options.getString('reason') || 'N/A'
-    const days = interaction.options.getNumber('deletedays') || 0
-    const member = await interaction.guild!.members.fetch({ user: target, force: true }).catch(() => null)
+  @authorizedOnly()
+  async execute(interaction: ChatInputCommandInteraction) {
+    const target = interaction.options.getUser('target')!;
+    const reason = interaction.options.getString('reason') || 'N/A';
+    const days = interaction.options.getNumber('deletedays') || 0;
+    const member = await interaction.guild!.members.fetch({ user: target, force: true }).catch(() => null);
     if (!member) {
       interaction.reply({
         content: "I can't find that user!",
@@ -64,23 +45,23 @@ const command: Command = {
         }
       ],
       ephemeral: true
-    })
+    });
     const dm = await directMessage(interaction.guild!, target, 'ban', {
       reason,
       moderator: interaction.user
-    })
+    });
     if (!dm)
       await interaction.followUp({
         content: 'I could not message that user!',
         ephemeral: true
-      })
-    await member.ban({ deleteMessageSeconds: days * 60 * 60 * 24, reason: reason })
+      });
+    await member.ban({ deleteMessageSeconds: days * 60 * 60 * 24, reason: reason });
     log(interaction.guild!, 'ban', {
       target,
       moderator: interaction.user,
       reason
-    })
+    });
   }
 }
 
-export default command;
+export default new Command();
