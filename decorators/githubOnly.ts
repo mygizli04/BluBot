@@ -1,5 +1,5 @@
 import { CommandInteraction } from "discord.js";
-import { getConfig } from "../types/config";
+import { getConfig } from "../types/config.js";
 
 const { githubToken } = await getConfig();
 

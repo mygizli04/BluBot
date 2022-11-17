@@ -2,7 +2,7 @@ import { ClientEvents, Message } from "discord.js";
 
 export default interface Event {
     event: keyof ClientEvents,
-    listener: (...args: Message[]) => Promise<void>
+    listener: (...args: any[]) => Promise<void>
 }
 
 export interface MessageCreateEvent extends Event {

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, CommandInteraction, HexColorString, Interaction, resolveColor, SlashCommandBuilder } from 'discord.js';
-import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 import { SlashCommand } from '../types/command.js';
 
 import { getConfig } from '../types/config.js';
@@ -17,7 +17,7 @@ class Command implements SlashCommand {
     .addStringOption(option => option.setName('reason').setDescription('Reason for the ban'))
     .addNumberOption(option => option.setName('deletedays').setDescription('Days to delete messages')) as SlashCommandBuilder;
 
-  @authorizedOnly()
+  @moderatorOnly()
   async execute(interaction: ChatInputCommandInteraction) {
     const target = interaction.options.getUser('target')!;
     const reason = interaction.options.getString('reason') || 'N/A';

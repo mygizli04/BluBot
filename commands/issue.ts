@@ -3,7 +3,7 @@ import { ApplicationCommandType, TextInputStyle } from 'discord-api-types/payloa
 import { CommandInteraction, Interaction, MessageContextMenuCommandInteraction } from 'discord.js';
 import { ContextMenuCommand } from '../types/command.js';
 
-import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 import { githubOnly } from '../decorators/githubOnly.js';
 
 function checkCommandType(interaction: CommandInteraction): interaction is MessageContextMenuCommandInteraction {
@@ -13,7 +13,7 @@ function checkCommandType(interaction: CommandInteraction): interaction is Messa
 class Command implements ContextMenuCommand {
   data = new ContextMenuCommandBuilder().setName('Create GitHub Issue').setType(ApplicationCommandType.Message);
 
-  @authorizedOnly()
+  @moderatorOnly()
   @githubOnly()
   async execute(interaction: MessageContextMenuCommandInteraction) {
     const modal = new ModalBuilder().setCustomId('newissue').setTitle('New GitHub Issue')

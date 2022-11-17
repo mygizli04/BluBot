@@ -1,6 +1,10 @@
-import { ChatInputCommandInteraction, CommandInteraction, ContextMenuCommandBuilder, MessageContextMenuCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, ContextMenuCommandBuilder, Interaction, MessageContextMenuCommandInteraction, SlashCommandBuilder } from "discord.js";
 
-export type Command = SlashCommand | ContextMenuCommand;
+export interface Command {
+    data: SlashCommandBuilder | ContextMenuCommandBuilder;
+
+    execute(interaction: ChatInputCommandInteraction | MessageContextMenuCommandInteraction): Promise<void>;
+}
 
 export interface SlashCommand {
     data: SlashCommandBuilder

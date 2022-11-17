@@ -7,7 +7,7 @@ const { customization } = await getConfig();
 const accent = customization?.accent;
 
 import { SlashCommand } from '../types/command.js';
-import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 
 function checkCommandType (interaction: CommandInteraction): interaction is ChatInputCommandInteraction {
   return interaction.commandType === ApplicationCommandType.ChatInput;
@@ -19,7 +19,7 @@ class Command implements SlashCommand {
     .setDescription('Lock a channel')
     .addChannelOption(option => option.setName('channel').setDescription('Channel to lock')) as SlashCommandBuilder;
 
-  @authorizedOnly()
+  @moderatorOnly()
   async execute(interaction: ChatInputCommandInteraction) {
     const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel;
     if (!channel) {

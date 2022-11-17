@@ -1,8 +1,8 @@
 import { APIEmbed, ChatInputCommandInteraction, HexColorString, resolveColor, SlashCommandBuilder } from 'discord.js';
-import * as reactionroles from '../utils/reactionroles';
+import * as reactionroles from '../utils/reactionroles.js';
 import { getConfig } from '../types/config.js';
-import { SlashCommand } from '../types/command';
-import { authorizedOnly } from '../decorators/authorizedOnly';
+import type { SlashCommand } from '../types/command';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 
 const config = await getConfig();
 
@@ -27,7 +27,7 @@ class Command implements SlashCommand {
     )
     .addSubcommand(subcommand => subcommand.setName('list').setDescription('List current reaction roles')) as SlashCommandBuilder;
 
-  @authorizedOnly()
+  @moderatorOnly()
   async execute(interaction: ChatInputCommandInteraction) {
     const role = interaction.options.getRole('role');
     const emoji = interaction.options.getString('emoji') ? interaction.options.getString('emoji')?.split(':').pop()?.match(/[0-9]+/)?.[0] || interaction.options.getString('emoji') : undefined;

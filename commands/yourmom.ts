@@ -1,7 +1,7 @@
 import { HexColorString, resolveColor, SlashCommandBuilder } from 'discord.js';
 import axios from "axios";
 import { getConfig } from '../types/config.js';
-import Command from '../types/command.js';
+import { SlashCommand } from '../types/command.js';
 
 const { customization } = await getConfig();
 const accent = customization?.accent;
@@ -10,7 +10,7 @@ interface Joke {
   joke: string
 }
 
-const command: Command = {
+const command: SlashCommand = {
   data: new SlashCommandBuilder().setName('yourmom').setDescription("yo momma so phat she couldn't run this command"),
   async execute(interaction) {
     const joke = await axios.get<Joke>('https://api.yomomma.info');

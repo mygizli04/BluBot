@@ -1,13 +1,12 @@
 import { SlashCommandBuilder, ModalBuilder, TextInputBuilder, ActionRowBuilder, TextInputStyle, ChatInputCommandInteraction, APIEmbed, resolveColor, HexColorString } from 'discord.js';
-import checkUserPerms from '../utils/checkUserPerms';
 import * as tag from '../utils/tag.js';
 
 import { getConfig } from '../types/config.js';
 const config = await getConfig();
 
-import { SlashCommand } from '../types/command';
-import { authorizedOnly } from '../decorators/authorizedOnly';
-import { nonFalsy } from '../decorators/nonNull';
+import type { SlashCommand } from '../types/command';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
+import { nonFalsy } from '../decorators/nonNull.js';
 
 class Command implements SlashCommand {
   data = new SlashCommandBuilder()
@@ -42,7 +41,7 @@ class Command implements SlashCommand {
         .addStringOption(option => option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true))
     ) as SlashCommandBuilder;
 
-  @authorizedOnly()
+  @moderatorOnly()
   async add (interaction: ChatInputCommandInteraction): Promise<void> {
     const modal = new ModalBuilder().setTitle('Add a tag').setCustomId('add-tag');
 
@@ -78,7 +77,7 @@ class Command implements SlashCommand {
     await interaction.showModal(modal);
   }
 
-  @authorizedOnly()
+  @moderatorOnly()
   async remove (interaction: ChatInputCommandInteraction): Promise<void> {
     const name = interaction.options.getString('name')!;
     if (!tag.get(name)) {
@@ -137,14 +136,14 @@ class Command implements SlashCommand {
       title: name,
       description: foundTag.content,
       color: config.customization?.accent ? resolveColor(config.customization.accent as HexColorString) : undefined,
-      image: {
+      image: foundTag.image ? {
         url: foundTag.image
-      }
+      } : undefined
     };
     user ? interaction.reply({ content: `<@${user.id}>, take a look at this!`, embeds: [embed] }) : interaction.reply({ embeds: [embed], ephemeral: preview ?? false });
   }
 
-  @authorizedOnly()
+  @moderatorOnly()
   async edit (interaction: ChatInputCommandInteraction): Promise<void> {
     const name = interaction.options.getString('name')!;
     const foundTag = await tag.get(name);
@@ -183,14 +182,14 @@ class Command implements SlashCommand {
       .setMaxLength(2000)
       .setStyle(TextInputStyle.Short)
       .setRequired(false)
-      .setValue(foundTag.image);
+      .setValue(foundTag.image ?? "");
 
     modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(nameInput), new ActionRowBuilder<TextInputBuilder>().addComponents(contentInput), new ActionRowBuilder<TextInputBuilder>().addComponents(imageInput));
 
     await interaction.showModal(modal);
   }
 
-  @authorizedOnly()
+  @moderatorOnly()
   @nonFalsy(config.channels?.faq, "An FAQ channel has not been configured. Please report this to the bot owner.")
   async faqtoggle(interaction: ChatInputCommandInteraction): Promise<void> {
     const name = interaction.options.getString('name')!;

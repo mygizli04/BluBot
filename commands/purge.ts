@@ -4,7 +4,7 @@ import log from '../utils/log.js';
 
 import { getConfig } from '../types/config.js';
 import { SlashCommand } from '../types/command.js';
-import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
@@ -32,7 +32,7 @@ class Command implements SlashCommand {
       .addChannelOption(option => option.setName('channel').setDescription('Channel to purge messages in'))
   ) as SlashCommandBuilder
 
-  @authorizedOnly()
+  @moderatorOnly()
   async execute(interaction: ChatInputCommandInteraction) {
     const amount = interaction.options.getNumber('amount')!;
     const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel

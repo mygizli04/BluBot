@@ -2,8 +2,8 @@ export interface ReactionRole {
     messageID: string,
     channelID: string,
     roles: {
-        emoji: unknown,
-        role: unknown,
+        emoji: string,
+        role: string,
         emojiName: unknown
     }[]
 }

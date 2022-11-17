@@ -5,7 +5,7 @@ import log from '../utils/log.js';
 
 import { getConfig } from '../types/config.js';
 import { SlashCommand } from '../types/command.js';
-import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
@@ -20,7 +20,7 @@ class Command implements SlashCommand {
     .addUserOption(option => option.setName('target').setDescription('User to kick').setRequired(true))
     .addStringOption(option => option.setName('reason').setDescription('Reason for the kick')) as SlashCommandBuilder;
 
-  @authorizedOnly()
+  @moderatorOnly()
   async execute(interaction: ChatInputCommandInteraction) {
     const target = interaction.options.getUser('target');
     const reason = interaction.options.getString('reason') || 'N/A';

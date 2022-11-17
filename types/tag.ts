@@ -12,7 +12,7 @@ export function validateTagDB(tagDB: TagDB): boolean {
 export interface Tag {
     name: string,
     content: string,
-    image: string,
+    image?: string,
     faqitem: boolean
 }
 

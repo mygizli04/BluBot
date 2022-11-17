@@ -73,7 +73,7 @@ export async function getDatabase(): Promise<ReactionRole[]> {
   return ensured;
 }
 
-export async function add(emoji: unknown, messageID: string, role: unknown, channel: string, emojiName: unknown, client: Client) {
+export async function add(emoji: string, messageID: string, role: string, channel: string, emojiName: unknown, client: Client) {
   const database = await getDatabase();
   const foundIndex = database.findIndex(d => d.messageID == messageID);
   if (foundIndex === -1)
@@ -99,7 +99,7 @@ export async function add(emoji: unknown, messageID: string, role: unknown, chan
   writeDatabase(database);
 }
 
-export async function remove (emoji: unknown, messageID: string) {
+export async function remove (emoji: string, messageID: string) {
   const database = await getDatabase();
   const index = database.findIndex(d => d.messageID == messageID);
   if (index === -1) return; // Oooohh silently erroring out I can't see what could ever go wrong lol
@@ -110,7 +110,7 @@ export async function remove (emoji: unknown, messageID: string) {
   writeDatabase(database);
 }
 
-export async function get(emoji: unknown, messageID: string) {
+export async function get(emoji: string, messageID: string) {
   const database = await getDatabase();
   const found = database.find(d => d.messageID == messageID);
   const roleFound = found?.roles.find(r => r.emoji == emoji);

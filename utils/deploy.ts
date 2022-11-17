@@ -10,7 +10,7 @@ const { guildId, token } = await getConfig();
 
 export default async function deploy(id: string) {
   const commands = []
-  const commandFiles = (await fs.readdir('./commands')).filter(file => file.endsWith('.js'))
+  const commandFiles = (await fs.readdir('./out/commands')).filter(file => file.endsWith('.js'))
 
   for (const file of commandFiles) {
     const command = (await import(`../commands/${file}`)).default

@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
 import { readFileSync } from "fs";
-import { getConfig } from '../types/config';
-import exists from './asyncFileExists';
+import { getConfig } from '../types/config.js';
+import exists from './asyncFileExists.js';
 import { APIEmbed, Client, HexColorString, resolveColor, TextChannel } from 'discord.js';
-import { Tag, TagDB, validateTag, validateTagDB } from '../types/tag';
+import { TagDB, validateTagDB } from '../types/tag.js';
 
 const config = await getConfig();
 
@@ -84,7 +84,7 @@ function generateEmbed(name: string, content: string, image: string): APIEmbed {
   };
 }
 
-export async function add(name: string, content: string, image: string, faqitem = false) {
+export async function add(name: string, content: string, image?: string, faqitem = false) {
   const database = await getDatabase();
   if (database[name]) return;
   database[name] = {
@@ -102,7 +102,7 @@ export async function remove(name: string) {
   await writeDatabase(database);
 }
 
-export async function modify(name: string, content: string | null, image: string | null, faqitem: boolean | null) {
+export async function modify(name: string, content: string | null, image?: string | null, faqitem?: boolean | null) {
   const database = await getDatabase();
   const item = database[name];
   if (!item) {

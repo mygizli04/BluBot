@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 
 import { getConfig } from '../types/config.js';
 import { SlashCommand } from '../types/command.js';
-import { authorizedOnly } from '../decorators/authorizedOnly.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
@@ -52,7 +52,7 @@ class Command implements SlashCommand {
     )
     .addSubcommand(subcommand => subcommand.setName('list').setDescription('List all censored words')) as SlashCommandBuilder;
 
-  @authorizedOnly()
+  @moderatorOnly()
   async execute (interaction: ChatInputCommandInteraction) {
     const word = interaction.options.getString('word', true).toLowerCase();
 

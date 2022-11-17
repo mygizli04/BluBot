@@ -1,4 +1,4 @@
-import { Client, Collection, GatewayIntentBits, Events } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, Events, ApplicationCommandType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import fs from 'fs/promises';
 import fileExists from "./utils/asyncFileExists.js";
 import deploy from './utils/deploy.js';
@@ -6,11 +6,12 @@ import bconsole from './utils/console.js';
 import { cacheAll } from './utils/reactionroles.js';
 import * as release from './utils/release.js';
 
-import Command from "./types/command.js"
+import { Command } from "./types/command.js"
 import Modal from './types/modal.js';
 import Event from './types/event.js';
 
 import { getConfig, configPath } from './types/config.js';
+import { AutoComplete } from './types/autocomplete.js';
 
 
 if (!await fileExists(configPath)) {
@@ -24,11 +25,13 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers]
 });
 
-const commands = new Collection<string, Command>()
-const modals = new Collection<string, Modal>()
+const commands = new Collection<string, Command>();
+const modals = new Collection<string, Modal>();
+const autoCompletes = new Collection<string, AutoComplete>();
 
-const commandFiles = (await fs.readdir('./out/commands')).filter(file => file.endsWith('.js'))
-const modalFiles = (await fs.readdir('./out/modals')).filter(file => file.endsWith('.js'))
+const commandFiles = (await fs.readdir('./out/commands')).filter(file => file.endsWith('.js'));
+const modalFiles = (await fs.readdir('./out/modals')).filter(file => file.endsWith('.js'));
+const autoCompleteFiles = (await fs.readdir('./out/autocomplete')).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
   const command: Command = (await import(`./commands/${file}`)).default
@@ -38,6 +41,11 @@ for (const file of commandFiles) {
 for (const file of modalFiles) {
   const modal: Modal = (await import(`./modals/${file}`)).default
   modals.set(modal.id, modal)
+}
+
+for (const file of autoCompleteFiles) {
+  const autoComplete: AutoComplete = (await import(`./autocomplete/${file}`)).default
+  autoCompletes.set(autoComplete.id, autoComplete)
 }
 
 bconsole.init()
@@ -60,6 +68,10 @@ client.on(Events.Error, error => {
 
 client.on(Events.InteractionCreate, async interaction => {
   if (interaction.isCommand()) {
+    if (interaction.commandType !== ApplicationCommandType.Message && interaction.commandType !== ApplicationCommandType.ChatInput) {
+      return;
+    }
+
     const command = commands.get(interaction.commandName)
     if (command) {
       try {
@@ -74,6 +86,17 @@ client.on(Events.InteractionCreate, async interaction => {
       try {
         await modal.execute(interaction)
       } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+  else if (interaction.isAutocomplete()) {
+    const autoComplete = autoCompletes.get(interaction.commandName)
+    if (autoComplete) {
+      try {
+        await autoComplete.execute(interaction)
+      }
+      catch (error) {
         console.error(error)
       }
     }

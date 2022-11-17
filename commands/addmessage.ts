@@ -6,13 +6,13 @@ import checkUserPerms from '../utils/checkUserPerms.js';
 import { CommandInteraction, Interaction, MessageContextMenuCommandInteraction } from "discord.js";
 
 import { getConfig } from "../types/config.js";
-import { authorizedOnly } from "../decorators/authorizedOnly.js";
+import { moderatorOnly } from "../decorators/authorizedOnly.js";
 import { githubOnly } from "../decorators/githubOnly.js";
 
 class Command implements ContextMenuCommand {
     data = new ContextMenuCommandBuilder().setName('Add to GitHub Issue').setType(ApplicationCommandType.Message);
 
-    @authorizedOnly()
+    @moderatorOnly()
     @githubOnly()
     async execute(interaction: MessageContextMenuCommandInteraction) {  
       const modal = new ModalBuilder().setCustomId('addmessage').setTitle('Add message to GitHub Issue')

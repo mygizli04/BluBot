@@ -1,7 +1,6 @@
 import { ChatInputCommandInteraction, Interaction, SlashCommandBuilder, TextChannel } from 'discord.js';
-import { authorizedOnly } from '../decorators/authorizedOnly';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 import { SlashCommand } from '../types/command';
-import checkUserPerms from '../utils/checkUserPerms';
 
 class Command implements SlashCommand {
   data = new SlashCommandBuilder()
@@ -10,7 +9,7 @@ class Command implements SlashCommand {
     .addStringOption(option => option.setName('message').setDescription('Message to echo').setRequired(true))
     .addChannelOption(option => option.setName('channel').setDescription('Channel to echo to')) as SlashCommandBuilder;
 
-    @authorizedOnly()
+    @moderatorOnly()
     async execute(interaction: ChatInputCommandInteraction) {  
       const message = interaction.options.getString('message', true);
       const channel = (interaction.options.getChannel('channel') || interaction.channel) as TextChannel;

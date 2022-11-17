@@ -3,7 +3,8 @@ import directMessage from '../utils/directMessage.js';
 import log from '../utils/log.js';
 
 import { getConfig } from '../types/config.js';
-import Command from '../types/command.js';
+import { SlashCommand } from '../types/command.js';
+import { moderatorOnly } from '../decorators/authorizedOnly.js';
 const { customization } = await getConfig();
 const accent = customization?.accent;
 
@@ -11,21 +12,15 @@ function checkCommandType (interaction: CommandInteraction): interaction is Chat
   return interaction.commandType === ApplicationCommandType.ChatInput;
 }
 
-const command: Command = {
-  data: new SlashCommandBuilder()
+class Command implements SlashCommand {
+  data = new SlashCommandBuilder()
     .setName('untimeout')
     .setDescription('Remove the timeout a member.')
     .addUserOption(option => option.setName('target').setDescription('User to remove timeout for').setRequired(true))
-    .addStringOption(option => option.setName('reason').setDescription('Reason for the timeout removal')) as SlashCommandBuilder,
-  async execute (interaction) {
-    if (!checkCommandType(interaction)) {
-      interaction.reply({
-        content: 'This command is only available as a slash command.',
-        ephemeral: true
-      });
-      return;
-    }
+    .addStringOption(option => option.setName('reason').setDescription('Reason for the timeout removal')) as SlashCommandBuilder;
 
+  @moderatorOnly()
+  async execute (interaction: ChatInputCommandInteraction) {
     const target = interaction.options.getUser('target')!;
     const reason = interaction.options.getString('reason') || 'N/A';
     const member = await interaction.guild!.members.fetch({ user: target, force: true }).catch(() => null);
@@ -68,6 +63,6 @@ const command: Command = {
       reason
     });
   }
-};
+}
 
-export default command;
+export default new Command();
